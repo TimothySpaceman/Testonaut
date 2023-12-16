@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  
+  api:
+    build:
+      context: ./docker/api/
+    container_name: ${PROJECT_NAME}-api
+    volumes:
+      - ./api:${API_DIRECTORY}
+    networks:
+      - ${PROJECT_NAME}
+
+  nginx:
+    build:
+      context: ./docker/nginx
+    container_name: ${PROJECT_NAME}-nginx
+    volumes:
+      - ./api:${API_DIRECTORY}
+    depends_on:
+      - api
+    environment:
+      API_DIRECTORY: ${API_DIRECTORY}
+    networks:
+      testonaut:
+        ipv4_address: ${NGINX_IPV4}
+
+
+volumes:
+  api:
+  nginx:
+  data:
+
+networks:
+  testonaut:
+    driver: "bridge"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.75.0/16
